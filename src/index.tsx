@@ -9,5 +9,5 @@ import "./theme.css";
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <StrictMode>
     <App />
-  </StrictMode>,
+  </StrictMode>
 );

@@ -10,11 +10,89 @@ export default function RequestPage({ requestNumber, token, onBack }: Props) {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
-  const load = useCallback(async () => { setLoading(true); try { setRequest(await requestApi.get(requestNumber, token)); setError(""); } catch (nextError) { setError(nextError instanceof Error ? nextError.message : "Unable to load request."); } finally { setLoading(false); } }, [requestNumber, token]);
-  useEffect(() => { void load(); }, [load]);
-  const submitComment = async (event: FormEvent) => { event.preventDefault(); if (!message.trim()) return; try { await requestApi.comment(requestNumber, message, token); setMessage(""); await load(); } catch (nextError) { setError(nextError instanceof Error ? nextError.message : "Unable to send message."); } };
-  const updateStatus = async (status: string) => { try { setRequest(await requestApi.status(token, requestNumber, status)); } catch (nextError) { setError(nextError instanceof Error ? nextError.message : "Unable to update status."); } };
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      setRequest(await requestApi.get(requestNumber, token));
+      setError("");
+    } catch (nextError) {
+      setError(nextError instanceof Error ? nextError.message : "Unable to load request.");
+    } finally {
+      setLoading(false);
+    }
+  }, [requestNumber, token]);
+  useEffect(() => {
+    void load();
+  }, [load]);
+  const submitComment = async (event: FormEvent) => {
+    event.preventDefault();
+    if (!message.trim()) return;
+    try {
+      await requestApi.comment(requestNumber, message, token);
+      setMessage("");
+      await load();
+    } catch (nextError) {
+      setError(nextError instanceof Error ? nextError.message : "Unable to send message.");
+    }
+  };
+  const updateStatus = async (status: string) => {
+    try {
+      setRequest(await requestApi.status(token, requestNumber, status));
+    } catch (nextError) {
+      setError(nextError instanceof Error ? nextError.message : "Unable to update status.");
+    }
+  };
   if (loading) return <p className="section-copy py-5">Loading request...</p>;
   if (!request) return <p className="error">{error}</p>;
-  return <section className="py-5"><button className="btn btn-link p-0 mb-3 nav-link" type="button" onClick={onBack}>Back to work</button><div className="panel"><p className="eyebrow">Website request {request.requestNumber}</p><h2>{request.projectDescription}</h2><div className="request-meta"><div><strong>Status</strong>{request.status.replace("_", " ")}</div><div><strong>Target date</strong>{request.targetDate}</div><div><strong>Budget</strong>{request.budgetRange}</div></div>{request.viewerIsAdmin ? <label className="form-label d-block mb-4">Status<select className="form-select mt-1" value={request.status} onChange={(event) => void updateStatus(event.target.value)}>{statuses.map((status) => <option key={status} value={status}>{status.replace("_", " ")}</option>)}</select></label> : null}<h3>Messages</h3>{request.comments.length ? request.comments.map((comment) => <article className="comment" key={comment.id}><strong>{comment.authorRole}</strong><span>{comment.body}</span></article>) : <p className="section-copy">No messages yet.</p>}<form className="row g-3 mt-1" onSubmit={submitComment}><label className="col-12 form-label">Add a message<textarea className="form-control mt-1" value={message} onChange={(event) => setMessage(event.target.value)} /></label><div className="col-12"><button className="btn btn-outline-light" type="submit">Post message</button>{error ? <p className="form-message error">{error}</p> : null}</div></form></div></section>;
+  return (
+    <section className="py-5">
+      <button className="btn btn-link p-0 mb-3 nav-link" type="button" onClick={onBack}>Back to work</button>
+      <div className="panel">
+        <p className="eyebrow">Website request {request.requestNumber}</p>
+        <h2>{request.projectDescription}</h2>
+        <div className="request-meta">
+          <div>
+            <strong>Status</strong>
+            {request.status.replace("_", " ")}
+          </div>
+          <div>
+            <strong>Target date</strong>
+            {request.targetDate}
+          </div>
+          <div>
+            <strong>Budget</strong>
+            {request.budgetRange}
+          </div>
+        </div>
+        {request.viewerIsAdmin ? (
+          <label className="form-label d-block mb-4">
+            Status
+            <select className="form-select mt-1" value={request.status} onChange={(event) => void updateStatus(event.target.value)}>
+              {statuses.map((status) => (
+                <option key={status} value={status}>{status.replace("_", " ")}</option>
+              ))}
+            </select>
+          </label>
+        ) : null}
+        <h3>Messages</h3>
+        {request.comments.length ? (
+          request.comments.map((comment) => (
+            <article className="comment" key={comment.id}>
+              <strong>{comment.authorRole}</strong>
+              <span>{comment.body}</span>
+            </article>
+          ))
+        ) : (
+          <p className="section-copy">No messages yet.</p>
+        )}
+        <form className="row g-3 mt-1" onSubmit={submitComment}>
+          <label className="col-12 form-label">Add a message<textarea className="form-control mt-1" value={message} onChange={(event) => setMessage(event.target.value)} /></label>
+          <div className="col-12">
+            <button className="btn btn-outline-light" type="submit">Post message</button>
+            {error ? <p className="form-message error">{error}</p> : null}
+          </div>
+        </form>
+      </div>
+    </section>
+  );
 }
