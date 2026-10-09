@@ -73,19 +73,17 @@ export default function App() {
       <main className="container pb-5">
         {view === "home" ? (
           <>
-            <section className="hero d-flex align-items-end" aria-label="David portfolio">
+            <section className="hero d-flex align-items-end">
               <div className="hero-content">
-                <p className="eyebrow">Independent web design and development</p>
                 <h1>Websites built to feel like yours.</h1>
-                <p className="hero-copy">A focused collection of digital work and a direct way to start the next one.</p>
+                <p className="text-muted">A focused collection of digital work and a direct way to start the next one.</p>
                 <div className="d-flex flex-wrap gap-2">
                   <button className="btn btn-primary" type="button" onClick={showRequest}>Request a website</button>
                   <button className="btn btn-outline-light" type="button" onClick={() => document.getElementById("work")?.scrollIntoView({ behavior: "smooth" })}>See work</button>
                 </div>
               </div>
             </section>
-            <section className="py-5 scroll-target" id="work">
-              <p className="eyebrow">Selected work</p>
+            <section className="py-5" id="work">
               <h2>Sites worth opening.</h2>
               {sites.length ? (
                 <div className="row g-3">
@@ -94,7 +92,7 @@ export default function App() {
                       <div className="site-card h-100">
                         <img src={site.screenshotUrl} alt="Website homepage preview" />
                         <div className="d-flex justify-content-end p-3">
-                          <a className="btn btn-outline-info btn-sm" href={site.siteUrl} target="_blank" rel="noreferrer">Open site <i aria-hidden="true" className="fa-solid fa-arrow-up-right-from-square ms-1" /></a>
+                          <a className="btn btn-outline-info btn-sm" href={site.siteUrl} target="_blank" rel="noreferrer">Open site <i className="fa-solid fa-arrow-up-right-from-square ms-1" /></a>
                         </div>
                       </div>
                     </article>

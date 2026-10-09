@@ -2,20 +2,7 @@ export type User = { name: string; email: string; role: string };
 export type AuthResponse = { token: string; user: User };
 export type PortfolioSite = { id: number; siteUrl: string; screenshotUrl: string; displayOrder: number };
 export type RequestComment = { id: number; authorRole: string; body: string; createdAt: string; updatedAt: string };
-export type WebsiteRequest = {
-  requestNumber: string;
-  customerName: string;
-  customerEmail: string;
-  customerPhone: string;
-  projectDescription: string;
-  targetDate: string;
-  budgetRange: string;
-  status: string;
-  createdAt: string;
-  updatedAt: string;
-  viewerIsAdmin: boolean;
-  comments: RequestComment[];
-};
+export type WebsiteRequest = { requestNumber: string; customerName: string; customerEmail: string; customerPhone: string; projectDescription: string; targetDate: string; budgetRange: string; status: string; createdAt: string; updatedAt: string; viewerIsAdmin: boolean; comments: RequestComment[]; };
 export type RequestDraft = { customerName: string; customerEmail: string; customerPhone: string; projectDescription: string; targetDate: string; budgetRange: string };
 
 const apiBaseUrl = process.env.REACT_APP_API_BASE_URL ?? "http://localhost:8002";

@@ -42,13 +42,13 @@ export default function RequestPage({ requestNumber, token, onBack }: Props) {
       setError(nextError instanceof Error ? nextError.message : "Unable to update status.");
     }
   };
-  if (loading) return <p className="section-copy py-5">Loading request...</p>;
+  if (loading) return <p className="py-5 text-muted">Loading request...</p>;
   if (!request) return <p className="error">{error}</p>;
   return (
     <section className="py-5">
       <button className="btn btn-link p-0 mb-3 nav-link" type="button" onClick={onBack}>Back to work</button>
       <div className="panel">
-        <p className="eyebrow">Website request {request.requestNumber}</p>
+        <p className="mb-2 small fw-bold text-uppercase text-info">Website request {request.requestNumber}</p>
         <h2>{request.projectDescription}</h2>
         <div className="request-meta">
           <div>
@@ -83,7 +83,7 @@ export default function RequestPage({ requestNumber, token, onBack }: Props) {
             </article>
           ))
         ) : (
-          <p className="section-copy">No messages yet.</p>
+          <p className="text-muted">No messages yet.</p>
         )}
         <form className="row g-3 mt-1" onSubmit={submitComment}>
           <label className="col-12 form-label">Add a message<textarea className="form-control mt-1" value={message} onChange={(event) => setMessage(event.target.value)} /></label>

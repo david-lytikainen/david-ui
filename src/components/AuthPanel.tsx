@@ -20,7 +20,7 @@ export default function AuthPanel({ onAuthed }: Props) {
   return (
     <section className="py-5">
       <div className="panel mx-auto auth-panel">
-        <p className="eyebrow">Admin</p>
+        <p className="mb-2 small fw-bold text-uppercase text-info">Admin</p>
         <h2>Sign in</h2>
         <form className="row g-3" onSubmit={submit}>
           <label className="col-12 form-label">Email<input className="form-control mt-1" required type="email" value={email} onChange={(event) => setEmail(event.target.value)} /></label>

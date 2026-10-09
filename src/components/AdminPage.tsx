@@ -89,7 +89,7 @@ export default function AdminPage({ token, onOpenRequest, onLogout }: Props) {
     <section className="py-5">
       <div className="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-4">
         <div>
-          <p className="eyebrow">Admin tools</p>
+          <p className="mb-2 small fw-bold text-uppercase text-info">Admin tools</p>
           <h2>Portfolio and requests</h2>
         </div>
         <button className="btn btn-outline-light" type="button" onClick={onLogout}>Sign out</button>
@@ -126,10 +126,10 @@ export default function AdminPage({ token, onOpenRequest, onLogout }: Props) {
               <div className="admin-row" key={site.id}>
                 <a href={site.siteUrl} target="_blank" rel="noreferrer">{site.siteUrl}</a>
                 <div className="d-flex gap-2">
-                  <button className="btn btn-outline-light btn-sm" aria-label="Edit site" type="button" onClick={() => { setEditingSite(site); setEditUrl(site.siteUrl); setEditScreenshot(null); }}><i aria-hidden="true" className="fa-solid fa-pen" /></button>
-                  <button className="btn btn-outline-light btn-sm" aria-label="Move site earlier" disabled={index === 0} type="button" onClick={() => void moveSite(site, -1)}><i aria-hidden="true" className="fa-solid fa-arrow-up" /></button>
-                  <button className="btn btn-outline-light btn-sm" aria-label="Move site later" disabled={index === sites.length - 1} type="button" onClick={() => void moveSite(site, 1)}><i aria-hidden="true" className="fa-solid fa-arrow-down" /></button>
-                  <button className="btn btn-outline-danger btn-sm" aria-label="Remove site" type="button" onClick={() => void removeSite(site)}><i aria-hidden="true" className="fa-solid fa-xmark" /></button>
+                  <button className="btn btn-outline-light btn-sm" type="button" onClick={() => { setEditingSite(site); setEditUrl(site.siteUrl); setEditScreenshot(null); }}><i className="fa-solid fa-pen" /></button>
+                  <button className="btn btn-outline-light btn-sm" disabled={index === 0} type="button" onClick={() => void moveSite(site, -1)}><i className="fa-solid fa-arrow-up" /></button>
+                  <button className="btn btn-outline-light btn-sm" disabled={index === sites.length - 1} type="button" onClick={() => void moveSite(site, 1)}><i className="fa-solid fa-arrow-down" /></button>
+                  <button className="btn btn-outline-danger btn-sm" type="button" onClick={() => void removeSite(site)}><i className="fa-solid fa-xmark" /></button>
                 </div>
               </div>
             ))
