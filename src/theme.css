@@ -253,6 +253,26 @@ a:focus-visible {
   text-align: center;
 }
 
+.work-open-mobile {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  display: none;
+  width: 2.5rem;
+  height: 2.5rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  color: var(--text-light);
+  background: rgba(7, 17, 31, 0.82);
+  text-decoration: none;
+}
+
+.work-open-mobile:hover {
+  color: var(--accent);
+}
+
 .form-control::placeholder {
   opacity: 1;
   color: var(--text-muted);
@@ -472,6 +492,35 @@ textarea.form-control {
 @media (max-width: 575.98px) {
   .admin-row {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .work-carousel {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+  }
+
+  .work-carousel::-webkit-scrollbar {
+    display: none;
+  }
+
+  .work-slide {
+    flex: 0 0 100%;
+    scroll-snap-align: start;
+  }
+
+  .work-open-mobile {
+    display: flex;
+  }
+}
+
+@media (min-width: 768px) {
+  .work-controls {
+    display: none !important;
   }
 }
 
