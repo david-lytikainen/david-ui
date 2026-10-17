@@ -1,6 +1,6 @@
 export type User = { name: string; email: string; role: string };
 export type AuthResponse = { token: string; user: User };
-export type PortfolioSite = { id: number; siteUrl: string; screenshotUrl: string; displayOrder: number };
+export type PortfolioSite = { id: number; name: string; siteUrl: string; screenshotUrl: string; displayOrder: number };
 export type RequestComment = { id: number; authorRole: string; body: string; createdAt: string; updatedAt: string };
 export type WebsiteRequest = { requestNumber: string; customerName: string; customerEmail: string; customerPhone: string; projectDescription: string; targetDate: string; budgetRange: string; status: string; createdAt: string; updatedAt: string; viewerIsAdmin: boolean; comments: RequestComment[]; };
 export type RequestDraft = { customerName: string; customerEmail: string; customerPhone: string; projectDescription: string; targetDate: string; budgetRange: string };
@@ -23,14 +23,16 @@ export const authApi = {
 export const portfolioApi = {
   list: () => request<PortfolioSite[]>("/portfolio"),
   listAdmin: (token: string) => request<PortfolioSite[]>("/admin/portfolio", {}, token),
-  create: (token: string, siteUrl: string, screenshot: File) => {
+  create: (token: string, name: string, siteUrl: string, screenshot: File) => {
     const body = new FormData();
+    body.append("name", name);
     body.append("site_url", siteUrl);
     body.append("screenshot", screenshot);
     return request<PortfolioSite>("/admin/portfolio", { method: "POST", body }, token);
   },
-  update: (token: string, id: number, siteUrl: string, screenshot?: File) => {
+  update: (token: string, id: number, name: string, siteUrl: string, screenshot?: File) => {
     const body = new FormData();
+    body.append("name", name);
     body.append("site_url", siteUrl);
     if (screenshot) body.append("screenshot", screenshot);
     return request<PortfolioSite>(`/admin/portfolio/${id}`, { method: "PATCH", body }, token);

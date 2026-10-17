@@ -64,6 +64,7 @@ html {
 }
 
 body {
+  position: relative;
   min-width: 320px;
   min-height: 100vh;
   margin: 0;
@@ -73,7 +74,7 @@ body {
 }
 
 body::before {
-  position: fixed;
+  position: absolute;
   inset: 0;
   z-index: 0;
   content: "";
@@ -87,13 +88,6 @@ body::before {
     radial-gradient(circle at 79% 32%, #fff 0 1px, transparent 1.5px),
     radial-gradient(circle at 93% 82%, #8fc8ff 0 1px, transparent 1.5px);
   background-size: 290px 250px, 360px 340px, 420px 380px, 320px 290px, 460px 410px, 390px 350px;
-  animation: drift 1s linear infinite;
-}
-
-@keyframes drift {
-  to {
-    background-position: 290px -250px, -360px 340px, 420px 380px, -320px -290px, 460px -410px, -390px 350px;
-  }
 }
 
 h1,
@@ -171,8 +165,7 @@ a:focus-visible {
   padding: 0 0.75rem;
 }
 
-.panel,
-.site-card {
+.panel {
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--bg-card);
@@ -185,17 +178,6 @@ a:focus-visible {
 
 .auth-panel {
   max-width: 560px;
-}
-
-.site-card {
-  overflow: hidden;
-}
-
-.site-card img {
-  display: block;
-  width: 100%;
-  aspect-ratio: 16 / 10;
-  object-fit: cover;
 }
 
 .form-message {
@@ -496,9 +478,5 @@ textarea.form-control {
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
-  }
-
-  body::before {
-    animation: none;
   }
 }

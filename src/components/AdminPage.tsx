@@ -7,9 +7,11 @@ type Props = { token: string; onOpenRequest: (requestNumber: string) => void; on
 export default function AdminPage({ token, onOpenRequest, onLogout }: Props) {
   const [sites, setSites] = useState<PortfolioSite[]>([]);
   const [requests, setRequests] = useState<WebsiteRequest[]>([]);
+  const [siteName, setSiteName] = useState("");
   const [siteUrl, setSiteUrl] = useState("");
   const [screenshot, setScreenshot] = useState<File | null>(null);
   const [editingSite, setEditingSite] = useState<PortfolioSite | null>(null);
+  const [editName, setEditName] = useState("");
   const [editUrl, setEditUrl] = useState("");
   const [editScreenshot, setEditScreenshot] = useState<File | null>(null);
   const [error, setError] = useState("");
@@ -35,7 +37,8 @@ export default function AdminPage({ token, onOpenRequest, onLogout }: Props) {
     }
     setSaving(true);
     try {
-      await portfolioApi.create(token, siteUrl, screenshot);
+      await portfolioApi.create(token, siteName, siteUrl, screenshot);
+      setSiteName("");
       setSiteUrl("");
       setScreenshot(null);
       await load();
@@ -59,8 +62,9 @@ export default function AdminPage({ token, onOpenRequest, onLogout }: Props) {
     if (!editingSite) return;
     setSaving(true);
     try {
-      await portfolioApi.update(token, editingSite.id, editUrl, editScreenshot ?? undefined);
+      await portfolioApi.update(token, editingSite.id, editName, editUrl, editScreenshot ?? undefined);
       setEditingSite(null);
+      setEditName("");
       setEditUrl("");
       setEditScreenshot(null);
       await load();
@@ -98,8 +102,9 @@ export default function AdminPage({ token, onOpenRequest, onLogout }: Props) {
       <div className="panel">
         <h3>Add portfolio site</h3>
         <form className="row g-3" onSubmit={createSite}>
-          <label className="col-md-6 form-label">Site URL<input className="form-control mt-1" required type="url" placeholder="https://example.com" value={siteUrl} onChange={(event) => setSiteUrl(event.target.value)} /></label>
-          <label className="col-md-6 form-label">Homepage screenshot<input className="form-control mt-1" required type="file" accept="image/*" onChange={chooseScreenshot} /></label>
+          <label className="col-md-4 form-label">Name<input className="form-control mt-1" required value={siteName} onChange={(event) => setSiteName(event.target.value)} /></label>
+          <label className="col-md-4 form-label">Site URL<input className="form-control mt-1" required type="url" placeholder="https://example.com" value={siteUrl} onChange={(event) => setSiteUrl(event.target.value)} /></label>
+          <label className="col-md-4 form-label">Homepage screenshot<input className="form-control mt-1" required type="file" accept="image/*" onChange={chooseScreenshot} /></label>
           <div className="col-12">
             <button className="btn btn-primary" disabled={saving} type="submit">{saving ? "Uploading..." : "Add site"}</button>
           </div>
@@ -109,8 +114,9 @@ export default function AdminPage({ token, onOpenRequest, onLogout }: Props) {
         <div className="panel mt-3">
           <h3>Edit portfolio site</h3>
           <form className="row g-3" onSubmit={editSite}>
-            <label className="col-md-6 form-label">Site URL<input className="form-control mt-1" required type="url" value={editUrl} onChange={(event) => setEditUrl(event.target.value)} /></label>
-            <label className="col-md-6 form-label">Replace screenshot<input className="form-control mt-1" type="file" accept="image/*" onChange={(event) => setEditScreenshot(event.target.files?.[0] ?? null)} /></label>
+            <label className="col-md-4 form-label">Name<input className="form-control mt-1" required value={editName} onChange={(event) => setEditName(event.target.value)} /></label>
+            <label className="col-md-4 form-label">Site URL<input className="form-control mt-1" required type="url" value={editUrl} onChange={(event) => setEditUrl(event.target.value)} /></label>
+            <label className="col-md-4 form-label">Replace screenshot<input className="form-control mt-1" type="file" accept="image/*" onChange={(event) => setEditScreenshot(event.target.files?.[0] ?? null)} /></label>
             <div className="col-12 d-flex flex-wrap gap-2">
               <button className="btn btn-primary" disabled={saving} type="submit">Save site</button>
               <button className="btn btn-outline-light" type="button" onClick={() => setEditingSite(null)}>Cancel</button>
@@ -124,9 +130,9 @@ export default function AdminPage({ token, onOpenRequest, onLogout }: Props) {
           {sites.length ? (
             sites.map((site, index) => (
               <div className="admin-row" key={site.id}>
-                <a href={site.siteUrl} target="_blank" rel="noreferrer">{site.siteUrl}</a>
+                <a href={site.siteUrl} target="_blank" rel="noreferrer">{site.name || site.siteUrl}</a>
                 <div className="d-flex gap-2">
-                  <button className="btn btn-outline-light btn-sm" type="button" onClick={() => { setEditingSite(site); setEditUrl(site.siteUrl); setEditScreenshot(null); }}><i className="fa-solid fa-pen" /></button>
+                  <button className="btn btn-outline-light btn-sm" type="button" onClick={() => { setEditingSite(site); setEditName(site.name); setEditUrl(site.siteUrl); setEditScreenshot(null); }}><i className="fa-solid fa-pen" /></button>
                   <button className="btn btn-outline-light btn-sm" disabled={index === 0} type="button" onClick={() => void moveSite(site, -1)}><i className="fa-solid fa-arrow-up" /></button>
                   <button className="btn btn-outline-light btn-sm" disabled={index === sites.length - 1} type="button" onClick={() => void moveSite(site, 1)}><i className="fa-solid fa-arrow-down" /></button>
                   <button className="btn btn-outline-danger btn-sm" type="button" onClick={() => void removeSite(site)}><i className="fa-solid fa-xmark" /></button>

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { CSSProperties, useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import { authApi, portfolioApi, PortfolioSite, User } from "./api";
 import AdminPage from "./components/AdminPage";
@@ -24,6 +24,26 @@ export default function App() {
   const [sites, setSites] = useState<PortfolioSite[]>([]);
   const [token, setToken] = useState("");
   const [user, setUser] = useState<User | null>(null);
+
+  const [angle, setAngle] = useState(0);
+  const targetRef = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const updateAngle = () => {
+      const elt = targetRef.current?.getBoundingClientRect();
+      if (!elt) return;
+      const angle = (elt.top + elt.height / 2 - window.innerHeight / 2) / 25;
+      if (angle < 0) return;
+      setAngle(angle);
+    };
+    updateAngle();
+    window.addEventListener("scroll", updateAngle, { passive: true });
+    window.addEventListener("resize", updateAngle);
+    return () => {
+      window.removeEventListener("scroll", updateAngle);
+      window.removeEventListener("resize", updateAngle);
+    };
+  }, [sites, view]);
+
   useEffect(() => {
     void portfolioApi.list().then(setSites).catch(() => setSites([]));
   }, []);
@@ -75,23 +95,24 @@ export default function App() {
           <>
             <section className="hero d-flex align-items-end">
               <div className="hero-content">
-                <h1>Websites built to feel like yours.</h1>
-                <p className="text-muted">A focused collection of digital work and a direct way to start the next one.</p>
-                <div className="d-flex flex-wrap gap-2">
-                  <button className="btn btn-primary" type="button" onClick={showRequest}>Request a website</button>
-                  <button className="btn btn-outline-light" type="button" onClick={() => document.getElementById("work")?.scrollIntoView({ behavior: "smooth" })}>See work</button>
-                </div>
+                <h1 className="m-0">Need a</h1>
+                <h1>website?</h1>
+                <p className="text-muted">I build them.</p>
+                <button className="btn btn-primary" type="button" onClick={showRequest}>Request a website</button>
               </div>
             </section>
             <section className="py-5" id="work">
-              <h2>Sites worth opening.</h2>
+              <h2>My Work</h2>
               {sites.length ? (
-                <div className="row g-3">
+                <div ref={targetRef} className="row g-3">
                   {sites.map((site) => (
-                    <article className="col-sm-6 col-lg-4" key={site.id}>
-                      <div className="site-card h-100">
-                        <img src={site.screenshotUrl} alt="Website homepage preview" />
-                        <div className="d-flex justify-content-end p-3">
+                    <article className="col-6 col-md-4" key={site.id} style={{ perspective: "200px" }}>
+                      <div className="card" style={{ background: "#0d1a2b", transform: `rotateX(${angle}deg)` }}>
+                        <div className="ratio" style={{ "--bs-aspect-ratio": "60.5%" } as CSSProperties}>
+                          <img className="h-100 w-100 object-fit-cover" src={site.screenshotUrl} alt="Website homepage preview" />
+                        </div>
+                        <div className="card-body d-none d-md-flex justify-content-between align-items-center py-3">
+                          <h5 className="mb-0 text-white">{site.name}</h5>
                           <a className="btn btn-outline-info btn-sm" href={site.siteUrl} target="_blank" rel="noreferrer">Open site <i className="fa-solid fa-arrow-up-right-from-square ms-1" /></a>
                         </div>
                       </div>
