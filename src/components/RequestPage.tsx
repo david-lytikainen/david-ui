@@ -49,7 +49,8 @@ export default function RequestPage({ requestNumber, token, onBack }: Props) {
       <button className="btn btn-link p-0 mb-3 nav-link" type="button" onClick={onBack}>Back to work</button>
       <div className="panel">
         <p className="mb-2 small fw-bold text-uppercase text-info">Website request {request.requestNumber}</p>
-        <h2>{request.projectDescription}</h2>
+        <h2>Project details</h2>
+        <p className="text-muted" style={{ whiteSpace: "pre-wrap" }}>{request.projectDescription}</p>
         <div className="request-meta">
           <div>
             <strong>Status</strong>
