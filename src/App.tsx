@@ -110,6 +110,7 @@ export default function App() {
             <section className="py-5" id="work">
               <h2>My Work</h2>
               {sites.length ? (
+                <>
                 <div ref={targetRef} className="row g-3 work-carousel" onScroll={(event) => {
                   const slides = Array.from(event.currentTarget.children) as HTMLElement[];
                   const carouselLeft = event.currentTarget.getBoundingClientRect().left;
@@ -132,6 +133,7 @@ export default function App() {
                   ))}
                 </div>
                 {sites.length > 1 ? <div className="work-controls d-flex d-md-none align-items-center justify-content-center gap-3 mt-3"><button className="btn btn-outline-info" type="button" onClick={() => moveSite(-1)} disabled={activeSite === 0} aria-label="Previous website"><i className="fa-solid fa-arrow-left" /></button><span className="small text-muted">Swipe to explore · {activeSite + 1} / {sites.length}</span><button className="btn btn-outline-info" type="button" onClick={() => moveSite(1)} disabled={activeSite === sites.length - 1} aria-label="Next website"><i className="fa-solid fa-arrow-right" /></button></div> : null}
+                </>
               ) : (
                 <div className="empty">Selected work is coming into view.</div>
               )}
