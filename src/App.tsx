@@ -30,17 +30,22 @@ export default function App() {
   const targetRef = useRef<HTMLDivElement>(null);
   const swipeStart = useRef<{ x: number; y: number } | null>(null);
   useLayoutEffect(() => {
+    let frame = 0;
     const updateAngle = () => {
-      const elt = targetRef.current?.getBoundingClientRect();
-      if (!elt) return;
-      const angle = (elt.top + elt.height / 2 - window.innerHeight / 2) / 25;
-      if (angle < 0) return;
-      setAngle(angle);
+      if (frame) return;
+      frame = window.requestAnimationFrame(() => {
+        frame = 0;
+        const elt = targetRef.current?.getBoundingClientRect();
+        if (!elt) return;
+        const nextAngle = (elt.top + elt.height / 2 - window.innerHeight / 2) / 25;
+        if (nextAngle >= 0) setAngle(nextAngle);
+      });
     };
     updateAngle();
     window.addEventListener("scroll", updateAngle, { passive: true });
     window.addEventListener("resize", updateAngle);
     return () => {
+      if (frame) window.cancelAnimationFrame(frame);
       window.removeEventListener("scroll", updateAngle);
       window.removeEventListener("resize", updateAngle);
     };
