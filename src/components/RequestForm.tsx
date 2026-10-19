@@ -35,7 +35,7 @@ export default function RequestForm({ onCreated }: Props) {
   return (
     <section className="py-5" id="request">
       <div className="panel">
-        <h2>What do you want me to build?</h2>
+        <h2>What do you want built?</h2>
         <form className="row g-2" onSubmit={submit}>
           <label className="col-12 form-label">What type of site?
             <select className="form-select mt-1" required value={siteType} onChange={(event) => setSiteType(event.target.value)}>
@@ -53,7 +53,8 @@ export default function RequestForm({ onCreated }: Props) {
             </div>
           </label>
           <fieldset className="col-12">
-            <legend className="form-label mb-2">What color palette do you want? Find it <a href="https://colorhunt.co/" target="_blank" rel="noreferrer">here</a>.</legend>
+            <legend className="form-label mb-0">What color palette do you want?</legend>
+            <p className="small text-muted mb-2">Find it <a href="https://colorhunt.co/" target="_blank" rel="noreferrer">here</a>.</p>
             <div className="row g-2">
               {colors.map((color, index) => (
                 <div className="col-6 col-sm" key={index}>
