@@ -269,6 +269,19 @@ a:focus-visible {
   text-decoration: none;
 }
 
+.work-image {
+  position: relative;
+}
+
+.work-swipe-hint {
+  display: none;
+}
+
+@keyframes swipe-hint {
+  0%, 72%, 100% { transform: translateX(0); opacity: 0.7; }
+  80%, 88% { transform: translateX(8px); opacity: 1; }
+}
+
 .work-open-mobile:hover {
   color: var(--accent);
 }
@@ -416,7 +429,7 @@ a:focus-visible {
 }
 
 .form-label {
-  color: var(--text-muted);
+  color: var(--text-light);
   font-size: 0.9rem;
   font-weight: 700;
 }
@@ -511,10 +524,29 @@ textarea.form-control {
   .work-open-mobile {
     display: flex;
   }
+
+  .work-swipe-hint {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.45rem;
+    margin-top: 0.5rem;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+  }
+
+  .work-swipe-hint i {
+    animation: swipe-hint 5s ease-in-out infinite;
+    color: var(--accent);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+
+  .work-swipe-hint i {
+    animation: none;
   }
 }

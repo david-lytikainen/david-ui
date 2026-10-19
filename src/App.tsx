@@ -146,6 +146,7 @@ export default function App() {
                     </article>
                   ))}
                 </div>
+                <div className="work-swipe-hint"><span>Swipe to explore</span><i className="fa-solid fa-arrow-right" aria-hidden="true" /></div>
                 </>
               ) : (
                 <div className="empty">Selected work is coming into view.</div>
