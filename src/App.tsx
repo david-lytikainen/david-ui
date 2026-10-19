@@ -28,6 +28,7 @@ export default function App() {
 
   const [angle, setAngle] = useState(0);
   const targetRef = useRef<HTMLDivElement>(null);
+  const swipeStart = useRef<{ x: number; y: number } | null>(null);
   useLayoutEffect(() => {
     const updateAngle = () => {
       const elt = targetRef.current?.getBoundingClientRect();
@@ -72,9 +73,22 @@ export default function App() {
   };
   const showHome = () => navigate("home", "/");
   const moveSite = (direction: -1 | 1) => {
-    const nextSite = Math.max(0, Math.min(sites.length - 1, activeSite + direction));
+    const nextSite = (activeSite + direction + sites.length) % sites.length;
     targetRef.current?.children[nextSite]?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "start" });
     setActiveSite(nextSite);
+  };
+  const startSwipe = (event: React.TouchEvent<HTMLDivElement>) => {
+    const touch = event.touches[0];
+    swipeStart.current = { x: touch.clientX, y: touch.clientY };
+  };
+  const finishSwipe = (event: React.TouchEvent<HTMLDivElement>) => {
+    const start = swipeStart.current;
+    swipeStart.current = null;
+    if (!start) return;
+    const touch = event.changedTouches[0];
+    const horizontal = touch.clientX - start.x;
+    const vertical = touch.clientY - start.y;
+    if (Math.abs(horizontal) > 40 && Math.abs(horizontal) > Math.abs(vertical)) moveSite(horizontal < 0 ? 1 : -1);
   };
   const showRequest = () => {
     showHome();
@@ -111,7 +125,7 @@ export default function App() {
               <h2>My Work</h2>
               {sites.length ? (
                 <>
-                <div ref={targetRef} className="row g-3 work-carousel" onScroll={(event) => {
+                <div ref={targetRef} className="row g-3 work-carousel" onTouchStart={startSwipe} onTouchEnd={finishSwipe} onScroll={(event) => {
                   const slides = Array.from(event.currentTarget.children) as HTMLElement[];
                   const carouselLeft = event.currentTarget.getBoundingClientRect().left;
                   const current = slides.reduce((nearest, slide, index) => Math.abs(slide.getBoundingClientRect().left - carouselLeft) < Math.abs(slides[nearest].getBoundingClientRect().left - carouselLeft) ? index : nearest, 0);
@@ -132,7 +146,6 @@ export default function App() {
                     </article>
                   ))}
                 </div>
-                {sites.length > 1 ? <div className="work-controls d-flex d-md-none align-items-center justify-content-center gap-3 mt-3"><button className="btn btn-outline-info" type="button" onClick={() => moveSite(-1)} disabled={activeSite === 0} aria-label="Previous website"><i className="fa-solid fa-arrow-left" /></button><span className="small text-muted">Swipe to explore · {activeSite + 1} / {sites.length}</span><button className="btn btn-outline-info" type="button" onClick={() => moveSite(1)} disabled={activeSite === sites.length - 1} aria-label="Next website"><i className="fa-solid fa-arrow-right" /></button></div> : null}
                 </>
               ) : (
                 <div className="empty">Selected work is coming into view.</div>

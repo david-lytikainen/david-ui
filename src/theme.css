@@ -255,8 +255,8 @@ a:focus-visible {
 
 .work-open-mobile {
   position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
+  top: 5%;
+  right: 5%;
   display: none;
   width: 2.5rem;
   height: 2.5rem;
@@ -498,14 +498,9 @@ textarea.form-control {
 @media (max-width: 767.98px) {
   .work-carousel {
     flex-wrap: nowrap;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
+    overflow: hidden;
     scrollbar-width: none;
-    overscroll-behavior-x: contain;
-  }
-
-  .work-carousel::-webkit-scrollbar {
-    display: none;
+    touch-action: pan-y;
   }
 
   .work-slide {
@@ -515,12 +510,6 @@ textarea.form-control {
 
   .work-open-mobile {
     display: flex;
-  }
-}
-
-@media (min-width: 768px) {
-  .work-controls {
-    display: none !important;
   }
 }
 
