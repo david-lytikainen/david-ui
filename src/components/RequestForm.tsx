@@ -43,8 +43,8 @@ export default function RequestForm({ onCreated }: Props) {
               {siteTypes.map((type) => <option key={type}>{type}</option>)}
             </select>
           </label>
-          <label className="col-12 form-label">What is the main use of the site?
-            <textarea className="form-control mt-1" required maxLength={300} placeholder="Selling my cookies" value={mainUse} onChange={(event) => setMainUse(event.target.value)} />
+          <label className="col-12 form-label">What do you want built?
+            <textarea className="form-control mt-1" rows={2} required maxLength={300} placeholder="Selling my cookies" value={mainUse} onChange={(event) => setMainUse(event.target.value)} />
           </label>
           <label className="col-12 form-label">What do you want it to look like?
             <div className="position-relative mt-1">
@@ -53,11 +53,10 @@ export default function RequestForm({ onCreated }: Props) {
             </div>
           </label>
           <fieldset className="col-12">
-            <legend className="form-label mb-0">What color palette do you want? <a href="https://colorhunt.co/" target="_blank" rel="noreferrer">Color Hunt</a></legend>
-            <p className="mb-2 text-muted">Paste up to 5 color hexes below</p>
+            <legend className="form-label mb-2">What color palette do you want? Find it <a href="https://colorhunt.co/" target="_blank" rel="noreferrer">here</a>.</legend>
             <div className="row g-2">
               {colors.map((color, index) => (
-                <div className="col-sm" key={index}>
+                <div className="col-6 col-sm" key={index}>
                   <input className="form-control" aria-label={`Color ${index + 1}`} maxLength={7} pattern="^#(?:[0-9a-fA-F]{3}){1,2}$" placeholder="e.g. #6A795D" value={color} onChange={(event) => setColors((current) => current.map((item, itemIndex) => itemIndex === index ? event.target.value : item))} />
                 </div>
               ))}
@@ -65,11 +64,15 @@ export default function RequestForm({ onCreated }: Props) {
           </fieldset>
           <fieldset className="col-md-6">
             <legend className="form-label">Should the site handle payments?</legend>
-            {['Yes', 'No'].map((value) => <div className="form-check form-check-inline" key={value}><input className="form-check-input" id={`payments-${value}`} name="payments" required type="radio" value={value} checked={payments === value} onChange={(event) => setPayments(event.target.value)} /><label className="form-check-label" htmlFor={`payments-${value}`}>{value}</label></div>)}
+            <div className="d-flex gap-2">
+              {['Yes', 'No'].map((value) => <span key={value}><input className="btn-check" id={`payments-${value}`} name="payments" required type="radio" value={value} checked={payments === value} onChange={(event) => setPayments(event.target.value)} /><label className="btn btn-outline-info rounded-pill px-4" htmlFor={`payments-${value}`}>{value}</label></span>)}
+            </div>
           </fieldset>
           <fieldset className="col-md-6">
             <legend className="form-label">Automatic emails?</legend>
-            {['Yes', 'No'].map((value) => <div className="form-check form-check-inline" key={value}><input className="form-check-input" id={`emails-${value}`} name="automaticEmails" required type="radio" value={value} checked={automaticEmails === value} onChange={(event) => setAutomaticEmails(event.target.value)} /><label className="form-check-label" htmlFor={`emails-${value}`}>{value}</label></div>)}
+            <div className="d-flex gap-2">
+              {['Yes', 'No'].map((value) => <span key={value}><input className="btn-check" id={`emails-${value}`} name="automaticEmails" required type="radio" value={value} checked={automaticEmails === value} onChange={(event) => setAutomaticEmails(event.target.value)} /><label className="btn btn-outline-info rounded-pill px-4" htmlFor={`emails-${value}`}>{value}</label></span>)}
+            </div>
           </fieldset>
           <label className="col-md-6 form-label">Your Name<input className="form-control mt-1" required value={draft.customerName} onChange={(event) => update("customerName", event.target.value)} /></label>
           <label className="col-md-6 form-label">Email<input className="form-control mt-1" required type="email" value={draft.customerEmail} onChange={(event) => update("customerEmail", event.target.value)} /></label>
