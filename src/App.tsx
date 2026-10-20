@@ -9,7 +9,7 @@ import RequestPage from "./components/RequestPage";
 
 type View = "home" | "admin" | "login" | "request";
 function readRoute(): { view: View; requestNumber: string } {
-  const match = window.location.pathname.match(/^\/request\/(\d{6})\/?$/);
+  const match = window.location.pathname.match(/^\/request\/(\d{6}|LYT-\d{9})\/?$/);
   if (match) return { view: "request", requestNumber: match[1] };
   if (window.location.pathname === "/admin") return { view: "admin", requestNumber: "" };
   if (window.location.pathname === "/admin/sign-in") return { view: "login", requestNumber: "" };
