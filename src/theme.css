@@ -90,6 +90,35 @@ body::before {
   background-size: 290px 250px, 360px 340px, 420px 380px, 320px 290px, 460px 410px, 390px 350px;
 }
 
+.comet {
+  position: absolute;
+  height: 3px;
+  width: 200px;
+}
+.comet::before {
+  content: "";
+  position: absolute;
+  background: linear-gradient(to left, #fff, transparent);
+  clip-path: polygon(0% 50%, 100% 0%, 100% 100%);
+  inset: 0;
+}
+.comet::after {
+  content: "";
+  position: absolute;
+  height: 6px;
+  width: 8px;
+  right: 0;
+  top: 50%;
+  background: radial-gradient(circle, #fff);
+  border-radius: 50%;
+  box-shadow: 0 0 20px 10px #3FA5FF;
+  animation: twinkle .8s ease-in-out infinite alternate;
+}
+@keyframes twinkle {
+  from { transform: translateY(-50%) translateX(50%); opacity: .7; }
+  to   { transform: translateY(-50%) translateX(50%); opacity: 1; }
+}
+
 h1,
 h2,
 h3,

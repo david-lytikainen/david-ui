@@ -126,6 +126,9 @@ export default function App() {
                 <button className="btn btn-primary" type="button" onClick={showRequest}>Request a website</button>
               </div>
             </section>
+
+            <div className="comet" style={{transform: `translateX(${angle * 10}px)`}}></div>
+
             <section className="py-5" id="work">
               <h2>My Work</h2>
               {sites.length ? (

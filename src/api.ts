@@ -5,7 +5,7 @@ export type RequestComment = { id: number; authorRole: string; body: string; cre
 export type WebsiteRequest = { requestNumber: string; customerName: string; customerEmail: string; customerPhone: string; projectDescription: string; targetDate: string; budgetRange: string; status: string; createdAt: string; updatedAt: string; viewerIsAdmin: boolean; comments: RequestComment[]; };
 export type RequestDraft = { customerName: string; customerEmail: string; customerPhone: string; projectDescription: string; targetDate: string; budgetRange: string };
 
-const apiBaseUrl = "/api";
+const apiBaseUrl = process.env.NODE_ENV === "development" ? "http://localhost:8002" : "/api";
 
 async function request<T>(path: string, options: RequestInit = {}, token?: string): Promise<T> {
   const headers = new Headers(options.headers);
