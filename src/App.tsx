@@ -17,6 +17,7 @@ function readRoute(): { view: View; requestNumber: string } {
 }
 
 export default function App() {
+  const isMobile = window.innerWidth < 768;
   const route = readRoute();
   const requestRef = useRef<HTMLDivElement | null>(null);
   const [view, setView] = useState<View>(route.view);
@@ -26,10 +27,12 @@ export default function App() {
   const [token, setToken] = useState("");
   const [user, setUser] = useState<User | null>(null);
 
+
+
   const [angle, setAngle] = useState(0);
   const targetRef = useRef<HTMLDivElement>(null);
   const swipeStart = useRef<{ x: number; y: number } | null>(null);
-  useLayoutEffect(() => {
+  useLayoutEffect(() => { //like useEffect, but after react updates the DOM
     let frame = 0;
     const updateAngle = () => {
       if (frame) return;
@@ -50,6 +53,30 @@ export default function App() {
       window.removeEventListener("resize", updateAngle);
     };
   }, [sites, view]);
+
+  const [cometWidth, setCometWidth] = useState(0);
+  const [left1, setLeft1] = useState(0);
+  const [top1, setTop1] = useState(0);
+  const [left2, setLeft2] = useState(0);
+  const [top2, setTop2] = useState(0);
+  const [cometAngle, setCometAngle] = useState(0);
+  useLayoutEffect(() => {
+    setCometWidth(window.innerHeight * .15);
+    const l1 = .75 * window.innerWidth, t1 = .40 * window.innerHeight;
+    let l2 = .50 * window.innerWidth, t2 = .15 * window.innerHeight;
+    if (isMobile) {
+      l2 = .30 * window.innerWidth;
+      t2 = .20 * window.innerHeight;
+    }
+    setLeft1(l1); setTop1(t1); setLeft2(l2); setTop2(t2);
+
+    const dx = l1 - l2;
+    const dy = t1 - t2;
+    const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+    setCometAngle(angle - 180);
+  }, []);
+
+
 
   useEffect(() => {
     void portfolioApi.list().then(setSites).catch(() => setSites([]));
@@ -115,22 +142,21 @@ export default function App() {
   return (
     <div className="min-vh-100">
       <Navigation isAdmin={Boolean(user)} onHome={showHome} onRequest={showRequest} onAdmin={() => navigate(user ? "admin" : "login", user ? "/admin" : "/admin/sign-in")} />
-      <main className="container pb-5">
+      <main className="container">
         {view === "home" ? (
           <>
-            <section className="hero d-flex align-items-end">
-              <div className="hero-content">
+            <section className="pt-5 mt-5 d-flex align-items-end">
+              <div>
                 <h1 className="m-0">Need a</h1>
                 <h1>website?</h1>
-                <p className="text-muted">I build them.</p>
+                <p className="text-muted">We bring your ideas to light</p>
                 <button className="btn btn-primary" type="button" onClick={showRequest}>Request a website</button>
               </div>
             </section>
 
-            <div className="comet" style={{transform: `translateX(${angle * 10}px)`}}></div>
+            <div className="comet" style={{ "--cometWidth": `${cometWidth}px`, "--left1": `${left1}px`, "--top1": `${top1}px`, "--left2": `${left2}px`, "--top2": `${top2}px`, "--cometAngle": `${cometAngle}deg` } as CSSProperties}></div>
 
-            <section className="py-5" id="work">
-              <h2>My Work</h2>
+            <section className="py-5 mt-5" id="work">
               {sites.length ? (
                 <>
                 <div ref={targetRef} className="row g-3 work-carousel" onTouchStart={startSwipe} onTouchEnd={finishSwipe} onScroll={(event) => {
