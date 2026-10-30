@@ -145,7 +145,7 @@ export default function App() {
       <main className="container">
         {view === "home" ? (
           <>
-            <section className="pt-5 mt-5 d-flex align-items-end">
+            <section className="py-5 my-5 d-flex align-items-end">
               <div>
                 <h1 className="m-0">Need a</h1>
                 <h1>website?</h1>
@@ -154,9 +154,16 @@ export default function App() {
               </div>
             </section>
 
-            <div className="comet" style={{ "--cometWidth": `${cometWidth}px`, "--left1": `${left1}px`, "--top1": `${top1}px`, "--left2": `${left2}px`, "--top2": `${top2}px`, "--cometAngle": `${cometAngle}deg` } as CSSProperties}></div>
 
-            <section className="py-5 mt-5" id="work">
+
+            <div className="comet" style={{ "--cometWidth": `${cometWidth}px`, "--left1": `${left1}px`, "--top1": `${top1}px`, "--left2": `${left2}px`, "--top2": `${top2}px`, "--cometAngle": `${cometAngle}deg` } as CSSProperties}></div>
+            <div className="star1"></div>
+            <div className="star2"></div>
+            <div className="star3"></div>
+
+
+
+            {/* <section className="py-5 mt-5" id="work">
               {sites.length ? (
                 <>
                 <div ref={targetRef} className="row g-3 work-carousel" onTouchStart={startSwipe} onTouchEnd={finishSwipe} onScroll={(event) => {
@@ -185,7 +192,8 @@ export default function App() {
               ) : (
                 <div className="empty">Selected work is coming into view.</div>
               )}
-            </section>
+            </section> */}
+
             <div ref={requestRef}>
               <RequestForm onCreated={openRequest} />
             </div>
