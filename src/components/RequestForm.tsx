@@ -4,6 +4,20 @@ import { RequestDraft, requestApi } from "../api";
 type Props = { onCreated: (requestNumber: string) => void };
 const initialDraft: RequestDraft = { customerName: "", customerEmail: "", customerPhone: "", projectDescription: "", targetDate: "", budgetRange: "" };
 const siteTypes = ["Business", "Personal", "Other"];
+const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+function getMinimumTargetDate() {
+  const today = new Date();
+  const month = today.getMonth() + 1;
+  const year = today.getFullYear() + Math.floor(month / 12);
+  const nextMonth = month % 12;
+  const day = Math.min(today.getDate(), new Date(year, nextMonth + 1, 0).getDate());
+  return { year, month: nextMonth + 1, day };
+}
+
+function formatDatePart(value: number) {
+  return String(value).padStart(2, "0");
+}
 
 export default function RequestForm({ onCreated }: Props) {
   const [draft, setDraft] = useState(initialDraft);
@@ -13,8 +27,17 @@ export default function RequestForm({ onCreated }: Props) {
   const [colors, setColors] = useState(["", "", "", "", ""]);
   const [payments, setPayments] = useState("");
   const [automaticEmails, setAutomaticEmails] = useState("");
+  const [targetYear, setTargetYear] = useState("");
+  const [targetMonth, setTargetMonth] = useState("");
+  const [targetDay, setTargetDay] = useState("");
   const [message, setMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const minimumTargetDate = getMinimumTargetDate();
+  const currentYear = new Date().getFullYear();
+  const targetYears = Array.from({ length: 11 }, (_, index) => currentYear + index).filter((year) => year >= minimumTargetDate.year);
+  const targetMonths = monthNames.map((name, index) => ({ name, value: index + 1 })).filter(({ value }) => Number(targetYear) !== minimumTargetDate.year || value >= minimumTargetDate.month);
+  const minimumTargetDay = Number(targetYear) === minimumTargetDate.year && Number(targetMonth) === minimumTargetDate.month ? minimumTargetDate.day : 1;
+  const targetDays = targetYear && targetMonth ? Array.from({ length: new Date(Number(targetYear), Number(targetMonth), 0).getDate() - minimumTargetDay + 1 }, (_, index) => minimumTargetDay + index) : [];
   const update = (field: keyof RequestDraft, value: string) => setDraft((current) => ({ ...current, [field]: value }));
   const submit = async (event: FormEvent) => {
     event.preventDefault();
@@ -78,7 +101,29 @@ export default function RequestForm({ onCreated }: Props) {
           <label className="col-md-6 form-label">Your Name<input className="form-control mt-1" required value={draft.customerName} onChange={(event) => update("customerName", event.target.value)} /></label>
           <label className="col-md-6 form-label">Email<input className="form-control mt-1" required type="email" value={draft.customerEmail} onChange={(event) => update("customerEmail", event.target.value)} /></label>
           <label className="col-md-6 form-label">Phone number<input className="form-control mt-1" required type="tel" value={draft.customerPhone} onChange={(event) => update("customerPhone", event.target.value)} /></label>
-          <label className="col-md-6 form-label">Target date<input className="form-control mt-1" required type="date" value={draft.targetDate} onChange={(event) => update("targetDate", event.target.value)} /></label>
+          <fieldset className="col-md-6">
+            <legend className="form-label">Target date</legend>
+            <div className="row g-2">
+              <div className="col-4">
+                <select className="form-select" aria-label="Target year" required value={targetYear} onChange={(event) => { setTargetYear(event.target.value); setTargetMonth(""); setTargetDay(""); update("targetDate", ""); }}>
+                  <option value="">Year</option>
+                  {targetYears.map((year) => <option key={year} value={year}>{year}</option>)}
+                </select>
+              </div>
+              <div className="col-4">
+                <select className="form-select" aria-label="Target month" required disabled={!targetYear} value={targetMonth} onChange={(event) => { setTargetMonth(event.target.value); setTargetDay(""); update("targetDate", ""); }}>
+                  <option value="">Month</option>
+                  {targetMonths.map(({ name, value }) => <option key={value} value={value}>{name}</option>)}
+                </select>
+              </div>
+              <div className="col-4">
+                <select className="form-select" aria-label="Target day" required disabled={!targetMonth} value={targetDay} onChange={(event) => { setTargetDay(event.target.value); update("targetDate", event.target.value ? `${targetYear}-${formatDatePart(Number(targetMonth))}-${formatDatePart(Number(event.target.value))}` : ""); }}>
+                  <option value="">Day</option>
+                  {targetDays.map((day) => <option key={day} value={day}>{day}</option>)}
+                </select>
+              </div>
+            </div>
+          </fieldset>
           <label className="col-12 form-label">Budget range<input className="form-control mt-1" required placeholder="For example, $2,000-$4,000" value={draft.budgetRange} onChange={(event) => update("budgetRange", event.target.value)} /></label>
           <div className="col-12">
             <button className="btn btn-primary" disabled={submitting} type="submit">{submitting ? "Sending..." : "Send request"}</button>
