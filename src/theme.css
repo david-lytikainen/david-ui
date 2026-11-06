@@ -294,6 +294,25 @@ a:focus-visible {
   max-width: 560px;
 }
 
+.target-date-picker {
+  z-index: 10;
+  width: min(100%, 23rem);
+  max-height: 70vh;
+  overflow-y: auto;
+  border-color: var(--line) !important;
+  background: var(--bg-panel);
+}
+
+.target-date-days {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.25rem;
+}
+
+.target-date-days .btn {
+  min-height: 2.5rem;
+}
+
 .form-message {
   margin: 0.875rem 0 0;
   color: var(--text-muted);

@@ -27,20 +27,25 @@ export default function RequestForm({ onCreated }: Props) {
   const [colors, setColors] = useState(["", "", "", "", ""]);
   const [payments, setPayments] = useState("");
   const [automaticEmails, setAutomaticEmails] = useState("");
+  const [pickerStep, setPickerStep] = useState<"year" | "month" | "day" | null>(null);
   const [targetYear, setTargetYear] = useState("");
   const [targetMonth, setTargetMonth] = useState("");
-  const [targetDay, setTargetDay] = useState("");
   const [message, setMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const minimumTargetDate = getMinimumTargetDate();
   const currentYear = new Date().getFullYear();
   const targetYears = Array.from({ length: 11 }, (_, index) => currentYear + index).filter((year) => year >= minimumTargetDate.year);
   const targetMonths = monthNames.map((name, index) => ({ name, value: index + 1 })).filter(({ value }) => Number(targetYear) !== minimumTargetDate.year || value >= minimumTargetDate.month);
-  const minimumTargetDay = Number(targetYear) === minimumTargetDate.year && Number(targetMonth) === minimumTargetDate.month ? minimumTargetDate.day : 1;
-  const targetDays = targetYear && targetMonth ? Array.from({ length: new Date(Number(targetYear), Number(targetMonth), 0).getDate() - minimumTargetDay + 1 }, (_, index) => minimumTargetDay + index) : [];
+  const [selectedYear, selectedMonth, selectedDay] = draft.targetDate.split("-").map(Number);
+  const targetDaysInMonth = targetYear && targetMonth ? new Date(Number(targetYear), Number(targetMonth), 0).getDate() : 0;
+  const firstWeekday = targetYear && targetMonth ? new Date(Number(targetYear), Number(targetMonth) - 1, 1).getDay() : 0;
   const update = (field: keyof RequestDraft, value: string) => setDraft((current) => ({ ...current, [field]: value }));
   const submit = async (event: FormEvent) => {
     event.preventDefault();
+    if (!draft.targetDate) {
+      setMessage("Please choose a target date.");
+      return;
+    }
     setSubmitting(true);
     setMessage("");
     try {
@@ -103,25 +108,46 @@ export default function RequestForm({ onCreated }: Props) {
           <label className="col-md-6 form-label">Phone number<input className="form-control mt-1" required type="tel" value={draft.customerPhone} onChange={(event) => update("customerPhone", event.target.value)} /></label>
           <fieldset className="col-md-6">
             <legend className="form-label">Target date</legend>
-            <div className="row g-2">
-              <div className="col-4">
-                <select className="form-select" aria-label="Target year" required value={targetYear} onChange={(event) => { setTargetYear(event.target.value); setTargetMonth(""); setTargetDay(""); update("targetDate", ""); }}>
-                  <option value="">Year</option>
-                  {targetYears.map((year) => <option key={year} value={year}>{year}</option>)}
-                </select>
-              </div>
-              <div className="col-4">
-                <select className="form-select" aria-label="Target month" required disabled={!targetYear} value={targetMonth} onChange={(event) => { setTargetMonth(event.target.value); setTargetDay(""); update("targetDate", ""); }}>
-                  <option value="">Month</option>
-                  {targetMonths.map(({ name, value }) => <option key={value} value={value}>{name}</option>)}
-                </select>
-              </div>
-              <div className="col-4">
-                <select className="form-select" aria-label="Target day" required disabled={!targetMonth} value={targetDay} onChange={(event) => { setTargetDay(event.target.value); update("targetDate", event.target.value ? `${targetYear}-${formatDatePart(Number(targetMonth))}-${formatDatePart(Number(event.target.value))}` : ""); }}>
-                  <option value="">Day</option>
-                  {targetDays.map((day) => <option key={day} value={day}>{day}</option>)}
-                </select>
-              </div>
+            <div className="position-relative">
+              <button className="form-control text-start" type="button" aria-haspopup="dialog" aria-expanded={pickerStep !== null} onClick={() => {
+                if (pickerStep) {
+                  setPickerStep(null);
+                } else {
+                  setTargetYear(selectedYear ? String(selectedYear) : "");
+                  setTargetMonth(selectedMonth ? String(selectedMonth) : "");
+                  setPickerStep("year");
+                }
+              }}>
+                {draft.targetDate ? new Date(`${draft.targetDate}T00:00:00`).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" }) : "Choose a date"}
+              </button>
+              {pickerStep ? (
+                <div className="target-date-picker position-absolute top-100 start-0 mt-1 rounded border p-3 shadow" role="dialog" aria-label="Choose target date" onKeyDown={(event) => { if (event.key === "Escape") setPickerStep(null); }}>
+                  <div className="d-flex align-items-center justify-content-between mb-3">
+                    <button className="btn btn-sm btn-outline-light" type="button" aria-label="Go back" disabled={pickerStep === "year"} onClick={() => setPickerStep(pickerStep === "day" ? "month" : "year")}><i className="fa-solid fa-arrow-left" /></button>
+                    <strong>{pickerStep === "year" ? "Choose a year" : pickerStep === "month" ? `Choose a month · ${targetYear}` : `${monthNames[Number(targetMonth) - 1]} ${targetYear}`}</strong>
+                    <button className="btn btn-sm btn-outline-light" type="button" aria-label="Close date picker" onClick={() => setPickerStep(null)}><i className="fa-solid fa-xmark" /></button>
+                  </div>
+                  {pickerStep === "year" ? (
+                    <div className="row row-cols-3 g-2">
+                      {targetYears.map((year) => <div className="col" key={year}><button className={`btn w-100 ${selectedYear === year ? "btn-primary" : "btn-outline-light"}`} type="button" onClick={() => { setTargetYear(String(year)); setTargetMonth(""); setPickerStep("month"); }}>{year}</button></div>)}
+                    </div>
+                  ) : pickerStep === "month" ? (
+                    <div className="row row-cols-3 g-2">
+                      {targetMonths.map(({ name, value }) => <div className="col" key={value}><button className={`btn w-100 ${selectedYear === Number(targetYear) && selectedMonth === value ? "btn-primary" : "btn-outline-light"}`} type="button" onClick={() => { setTargetMonth(String(value)); setPickerStep("day"); }}>{name}</button></div>)}
+                    </div>
+                  ) : (
+                    <div className="target-date-days text-center">
+                      {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((day) => <span className="small text-muted" key={day}>{day}</span>)}
+                      {Array.from({ length: firstWeekday }, (_, index) => <span key={`empty-${index}`} />)}
+                      {Array.from({ length: targetDaysInMonth }, (_, index) => {
+                        const day = index + 1;
+                        const disabled = Number(targetYear) === minimumTargetDate.year && Number(targetMonth) === minimumTargetDate.month && day < minimumTargetDate.day;
+                        return <button className={`btn btn-sm px-0 ${selectedYear === Number(targetYear) && selectedMonth === Number(targetMonth) && selectedDay === day ? "btn-primary" : "btn-outline-light"}`} key={day} type="button" disabled={disabled} onClick={() => { update("targetDate", `${targetYear}-${formatDatePart(Number(targetMonth))}-${formatDatePart(day)}`); setPickerStep(null); }}>{day}</button>;
+                      })}
+                    </div>
+                  )}
+                </div>
+              ) : null}
             </div>
           </fieldset>
           <label className="col-12 form-label">Budget range<input className="form-control mt-1" required placeholder="For example, $2,000-$4,000" value={draft.budgetRange} onChange={(event) => update("budgetRange", event.target.value)} /></label>
