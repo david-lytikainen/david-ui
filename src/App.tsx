@@ -29,30 +29,7 @@ export default function App() {
 
 
 
-  const [angle, setAngle] = useState(0);
-  const targetRef = useRef<HTMLDivElement>(null);
-  const swipeStart = useRef<{ x: number; y: number } | null>(null);
-  useLayoutEffect(() => { //like useEffect, but after react updates the DOM
-    let frame = 0;
-    const updateAngle = () => {
-      if (frame) return;
-      frame = window.requestAnimationFrame(() => {
-        frame = 0;
-        const elt = targetRef.current?.getBoundingClientRect();
-        if (!elt) return;
-        const nextAngle = (elt.top + elt.height / 2 - window.innerHeight / 2) / 25;
-        if (nextAngle >= 0) setAngle(nextAngle);
-      });
-    };
-    updateAngle();
-    window.addEventListener("scroll", updateAngle, { passive: true });
-    window.addEventListener("resize", updateAngle);
-    return () => {
-      if (frame) window.cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", updateAngle);
-      window.removeEventListener("resize", updateAngle);
-    };
-  }, [sites, view]);
+
 
   const [cometWidth, setCometWidth] = useState(0);
   const [left1, setLeft1] = useState(0);
@@ -75,6 +52,16 @@ export default function App() {
     const angle = Math.atan2(dy, dx) * 180 / Math.PI;
     setCometAngle(angle - 180);
   }, []);
+  const [showSite1, setShowSite1] = useState(false);
+
+  useEffect(() => {
+    if (showSite1)
+      document.body.classList.add("zoom");
+    else
+      document.body.classList.remove("zoom");
+  }, [showSite1]);
+
+
 
 
 
@@ -104,24 +91,6 @@ export default function App() {
     setRequestNumber(nextRequestNumber);
   };
   const showHome = () => navigate("home", "/");
-  const moveSite = (direction: -1 | 1) => {
-    const nextSite = (activeSite + direction + sites.length) % sites.length;
-    targetRef.current?.children[nextSite]?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "start" });
-    setActiveSite(nextSite);
-  };
-  const startSwipe = (event: React.TouchEvent<HTMLDivElement>) => {
-    const touch = event.touches[0];
-    swipeStart.current = { x: touch.clientX, y: touch.clientY };
-  };
-  const finishSwipe = (event: React.TouchEvent<HTMLDivElement>) => {
-    const start = swipeStart.current;
-    swipeStart.current = null;
-    if (!start) return;
-    const touch = event.changedTouches[0];
-    const horizontal = touch.clientX - start.x;
-    const vertical = touch.clientY - start.y;
-    if (Math.abs(horizontal) > 40 && Math.abs(horizontal) > Math.abs(vertical)) moveSite(horizontal < 0 ? 1 : -1);
-  };
   const showRequest = () => {
     showHome();
     window.setTimeout(() => requestRef.current?.scrollIntoView({ behavior: "smooth" }), 0);
@@ -155,9 +124,10 @@ export default function App() {
             </section>
 
 
+            <div className="d-block" style={{ height: "200px" }}></div>
 
             <div className="comet" style={{ "--cometWidth": `${cometWidth}px`, "--left1": `${left1}px`, "--top1": `${top1}px`, "--left2": `${left2}px`, "--top2": `${top2}px`, "--cometAngle": `${cometAngle}deg` } as CSSProperties}></div>
-            <div className="star1"></div>
+            <div className="star1" onClick={() => setShowSite1(!showSite1)}></div>
             <div className="star2"></div>
             <div className="star3"></div>
 
@@ -193,6 +163,13 @@ export default function App() {
                 <div className="empty">Selected work is coming into view.</div>
               )}
             </section> */}
+            {/* {sites.length ? (
+              <article className={showSite1 ? "site1 show col-12" : "site1 col-12"} key={sites[0].id}>
+                <img className="h-100 w-100" src={sites[0].screenshotUrl} alt="Website homepage preview" />
+                <a href={sites[0].siteUrl} target="_blank" rel="noreferrer" title="Open site"><i className="fa-solid fa-arrow-up-right-from-square" /></a>
+              </article>
+            ) : (<div></div>)} */}
+
 
             <div ref={requestRef}>
               <RequestForm onCreated={openRequest} />
