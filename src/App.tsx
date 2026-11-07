@@ -52,14 +52,15 @@ export default function App() {
     const angle = Math.atan2(dy, dx) * 180 / Math.PI;
     setCometAngle(angle - 180);
   }, []);
-  const [showSite1, setShowSite1] = useState(false);
 
-  useEffect(() => {
-    if (showSite1)
-      document.body.classList.add("zoom");
-    else
-      document.body.classList.remove("zoom");
-  }, [showSite1]);
+  const [showSite1, setShowSite1] = useState(false);
+  const [showSite2, setShowSite2] = useState(false);
+  const [showSite3, setShowSite3] = useState(false);
+  useLayoutEffect(() => {
+    document.body.classList.toggle("zoom1", showSite1);
+    document.body.classList.toggle("zoom2", showSite2);
+    document.body.classList.toggle("zoom3", showSite3);
+  }, [showSite1, showSite2, showSite3]);
 
 
 
@@ -109,7 +110,7 @@ export default function App() {
     showHome();
   };
   return (
-    <div className="min-vh-100">
+    <div className="min-vh-100 app">
       <Navigation isAdmin={Boolean(user)} onHome={showHome} onRequest={showRequest} onAdmin={() => navigate(user ? "admin" : "login", user ? "/admin" : "/admin/sign-in")} />
       <main className="container">
         {view === "home" ? (
@@ -124,12 +125,12 @@ export default function App() {
             </section>
 
 
-            <div className="d-block" style={{ height: "200px" }}></div>
+            <div className="d-block" style={{ height: "700px" }}></div>
 
             <div className="comet" style={{ "--cometWidth": `${cometWidth}px`, "--left1": `${left1}px`, "--top1": `${top1}px`, "--left2": `${left2}px`, "--top2": `${top2}px`, "--cometAngle": `${cometAngle}deg` } as CSSProperties}></div>
-            <div className="star1" onClick={() => setShowSite1(!showSite1)}></div>
-            <div className="star2"></div>
-            <div className="star3"></div>
+            <div className={showSite1 ? "star1 zoom1" : showSite2 ? "star1 zoom2" : showSite3 ? "star1 zoom3" : "star1"} onClick={() => setShowSite1(!showSite1)}></div>
+            <div className={showSite1 ? "star2 zoom1" : showSite2 ? "star2 zoom2" : showSite3 ? "star2 zoom3" : "star2"} onClick={() => setShowSite2(!showSite2)}></div>
+            <div className={showSite1 ? "star3 zoom1" : showSite2 ? "star3 zoom2" : showSite3 ? "star3 zoom3" : "star3"} onClick={() => setShowSite3(!showSite3)}></div>
 
 
 
@@ -163,12 +164,12 @@ export default function App() {
                 <div className="empty">Selected work is coming into view.</div>
               )}
             </section> */}
-            {/* {sites.length ? (
-              <article className={showSite1 ? "site1 show col-12" : "site1 col-12"} key={sites[0].id}>
-                <img className="h-100 w-100" src={sites[0].screenshotUrl} alt="Website homepage preview" />
-                <a href={sites[0].siteUrl} target="_blank" rel="noreferrer" title="Open site"><i className="fa-solid fa-arrow-up-right-from-square" /></a>
+            {sites.length ? (
+              <article className={showSite1 ? "site1 show col-12" : ""} key={sites[0].id}>
+                <img className="w-100 h-100" src={sites[0].screenshotUrl} alt="Website homepage preview" />
+                {/* <a href={sites[0].siteUrl} target="_blank" rel="noreferrer" title="Open site"><i className="fa-solid fa-arrow-up-right-from-square" /></a> */}
               </article>
-            ) : (<div></div>)} */}
+            ) : (<div></div>)}
 
 
             <div ref={requestRef}>

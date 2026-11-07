@@ -63,6 +63,11 @@ html {
   background: var(--bg-page);
 }
 
+#root {
+  position: relative;
+  z-index: 1;
+}
+
 body {
   position: relative;
   min-width: 320px;
@@ -77,32 +82,126 @@ body::before {
   position: absolute;
   inset: 0;
   z-index: 0;
-  opacity: .62;
+  opacity: 1;
   pointer-events: none;
-  background-image:
-    radial-gradient(circle at 3% 5%, #d9efff 0 1px, transparent 1.5px),
-    radial-gradient(circle at 9% 18%, #8fc8ff 0 1px, transparent 1.5px),
-    radial-gradient(circle at 13% 24%, #fff 0 1px, transparent 1.5px),
-    radial-gradient(circle at 42% 57%, #d9efff 0 1px, transparent 1.5px),
-    radial-gradient(circle at 81% 74%, #fff 0 1px, transparent 1.5px),
-    radial-gradient(circle at 92% 99%, #8fc8ff 0 1px, transparent 1.5px),
-    radial-gradient(circle at 5% 98%, #fff 0 1px, transparent 1.5px),
-    radial-gradient(circle at 14% 87%, #fff 0 1px, transparent 1.5px),
-    radial-gradient(circle at 26% 71%, #fff 0 1px, transparent 1.5px),
-    radial-gradient(circle at 37% 59%, #fff 0 1px, transparent 1.5px),
-    radial-gradient(circle at 46% 52%, #8fc8ff 0 1px, transparent 1.5px);
-  background-size: 250px 279px, 378px 401px, 330px 492px, 502px 374px, 791px 923px, 674px 451px, 130px 844px, 220px 730px, 290px 610px, 330px 490px, 410px 370px;
+  background-image: url("../public/stars3.jpg");
+  background-size: 100% auto;
+  background-repeat: no-repeat;
 }
-body.zoom::before {
+@media (max-width: 767px) {
+  body::before {
+    background-size: auto 800px;
+    background-position: center top;
+  }
+}
+body.zoom1::before {
   content: "";
-  animation: zoom 3s forwards;
-  transform-origin: 72% 20%;
+  animation: zoom1 2s ease-out forwards;
+  transform-origin: 72vw 55vh;
 }
-@keyframes zoom {
-  0% { }
-  100% { transform: translate(-22%, 22%) scale(3) }
+body.zoom2::before {
+  content: "";
+  animation: zoom2 3s forwards;
+  transform-origin: 29vw 68vh;
+}
+body.zoom3::before {
+  content: "";
+  animation: zoom3 3s forwards;
+  transform-origin: 52vw 83vh;
+}
+@keyframes zoom1 {
+  100% { transform: translate(-22vw, 18vh) scale(3) }
+}
+@keyframes zoom2 {
+  100% { transform: translate(21vw, 5vh) scale(3) }
+}
+@keyframes zoom3 {
+  100% { transform: translate(-2vw, -10vh) scale(3) }
 }
 
+
+.star1 {
+  position: absolute;
+  height: 2px; 
+  width: 2px;
+  left: 72vw;
+  top: 55vh;
+  background: radial-gradient(circle, #fff);
+  border-radius: 50%;
+}
+.star1.zoom1 { animation: zoom1 2s ease-out forwards; }
+.star1.zoom2 { opacity: 0; pointer-events: none; }
+.star1.zoom3 { opacity: 0; pointer-events: none; }
+.star1::after {
+  content:"";
+  position:absolute;
+  inset:-10px;
+  border:1px solid rgba(255,255,255,.7);
+  border-radius:50%;
+  animation: ring 1.5s ease-in-out infinite alternate;
+}
+.site1 {
+  position: absolute;
+  left: 72vw;
+  top: 55vh;
+  transform: translate(-50%, -50%) scale(.01);
+  opacity: 0;
+  pointer-events: none;
+}
+.site1.show {
+  animation: site1Zoom 2s ease-out forwards;
+}
+@keyframes site1Zoom {
+  50% { opacity: 1; }
+  100% { transform: translate(-50%, -50%) translate(-22vw, 18vh) scale(.8); opacity: 1; }
+}
+
+.star2 {
+  position: absolute;
+  height: 2px; 
+  width: 2px;
+  left: 29vw;
+  top: 68vh;
+  background: radial-gradient(circle, #fff);
+  border-radius: 50%;
+  transition: opacity 300ms ease;
+}
+.star2.zoom1 { opacity: 0; pointer-events: none; }
+.star2.zoom2 { animation: zoom2 3s forwards; }
+.star2.zoom3 { opacity: 0; pointer-events: none; }
+.star2::after {
+  content:"";
+  position:absolute;
+  inset:-10px;
+  border:1px solid rgba(255,255,255,.7);
+  border-radius:50%;
+  animation: ring 1.5s ease-in-out 340ms infinite alternate;
+}
+.star3 {
+  position: absolute;
+  height: 2px; 
+  width: 2px;
+  left: 52vw;
+  top: 83vh;
+  background: radial-gradient(circle, #fff);
+  border-radius: 50%;
+  transition: opacity 300ms ease;
+}
+.star3.zoom1 { opacity: 0; pointer-events: none; }
+.star3.zoom2 { opacity: 0; pointer-events: none; }
+.star3.zoom3 { animation: zoom3 3s forwards; }
+.star3::after {
+  content:"";
+  position:absolute;
+  inset:-10px;
+  border:1px solid rgba(255,255,255,.7);
+  border-radius:50%;
+  animation: ring 1.5s ease-in-out 680ms infinite alternate;
+}
+@keyframes ring {
+  from { transform:scale(1.3); }
+  to { transform:scale(1.5); }
+}
 
 
 
@@ -164,81 +263,6 @@ body.zoom::before {
   100% { opacity: 0; }
 }
 
-
-
-.star1 {
-  position: absolute;
-  height: 2px; 
-  width: 2px;
-  left: 72%;
-  top: 20%;
-  background: radial-gradient(circle, #fff);
-  border-radius: 50%;
-}
-.star1::after {
-  content:"";
-  position:absolute;
-  inset:-10px;
-  border:1px solid rgba(255,255,255,.7);
-  border-radius:50%;
-  animation: ring 1.5s ease-in-out infinite alternate;
-}
-.site1 {
-  opacity: 0;
-  pointer-events: none;
-}
-.site1.show {
-  opacity: 1;
-  animation: open 200ms ease-in;
-}
-@keyframes open {
-  0% { opacity: 0; transform: scale(0); }
-  20% { opacity: .2; transform: scale(.2); }
-  40% { opacity: .4; transform: scale(.4); }
-  60% { opacity: .6; transform: scale(.6); }
-  80% { opacity: .8; transform: scale(.8); }
-  100% { opacity: 1; transform: scale(1); }
-}
-
-.star2 {
-  position: absolute;
-  height: 2px; 
-  width: 2px;
-  top: 24%;
-  left: 29%;
-  background: radial-gradient(circle, #fff);
-  border-radius: 50%;
-}
-.star2::after {
-  content:"";
-  position:absolute;
-  inset:-10px;
-  border:1px solid rgba(255,255,255,.7);
-  border-radius:50%;
-  animation: ring 1.5s ease-in-out 340ms infinite alternate;
-}
-
-.star3 {
-  position: absolute;
-  height: 2px; 
-  width: 2px;
-  top: 29%;
-  left: 52%;
-  background: radial-gradient(circle, #fff);
-  border-radius: 50%;
-}
-.star3::after {
-  content:"";
-  position:absolute;
-  inset:-10px;
-  border:1px solid rgba(255,255,255,.7);
-  border-radius:50%;
-  animation: ring 1.5s ease-in-out 680ms infinite alternate;
-}
-@keyframes ring {
-  from { transform:scale(1.3); }
-  to { transform:scale(1.5); }
-}
 
 
 
