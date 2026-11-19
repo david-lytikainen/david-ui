@@ -1,4 +1,4 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { RequestDraft, requestApi } from "../api";
 
 type Props = { onCreated: (requestNumber: string) => void };
@@ -28,6 +28,7 @@ export default function RequestForm({ onCreated }: Props) {
   const [payments, setPayments] = useState("");
   const [automaticEmails, setAutomaticEmails] = useState("");
   const [pickerStep, setPickerStep] = useState<"year" | "month" | "day" | null>(null);
+  const pickerRef = useRef<HTMLDialogElement>(null);
   const [targetYear, setTargetYear] = useState("");
   const [targetMonth, setTargetMonth] = useState("");
   const [message, setMessage] = useState("");
@@ -38,7 +39,11 @@ export default function RequestForm({ onCreated }: Props) {
   const targetMonths = monthNames.map((name, index) => ({ name, value: index + 1 })).filter(({ value }) => Number(targetYear) !== minimumTargetDate.year || value >= minimumTargetDate.month);
   const [selectedYear, selectedMonth, selectedDay] = draft.targetDate.split("-").map(Number);
   const targetDaysInMonth = targetYear && targetMonth ? new Date(Number(targetYear), Number(targetMonth), 0).getDate() : 0;
-  const firstWeekday = targetYear && targetMonth ? new Date(Number(targetYear), Number(targetMonth) - 1, 1).getDay() : 0;
+  useEffect(() => {
+    const picker = pickerRef.current;
+    if (pickerStep && picker && !picker.open) picker.showModal();
+    else if (!pickerStep && picker?.open) picker.close();
+  }, [pickerStep]);
   const update = (field: keyof RequestDraft, value: string) => setDraft((current) => ({ ...current, [field]: value }));
   const submit = async (event: FormEvent) => {
     event.preventDefault();
@@ -108,7 +113,7 @@ export default function RequestForm({ onCreated }: Props) {
           <label className="col-md-6 form-label">Phone number<input className="form-control mt-1" required type="tel" value={draft.customerPhone} onChange={(event) => update("customerPhone", event.target.value)} /></label>
           <fieldset className="col-md-6">
             <legend className="form-label">Target date</legend>
-            <div className="position-relative">
+            <div>
               <button className="form-control text-start" type="button" aria-haspopup="dialog" aria-expanded={pickerStep !== null} onClick={() => {
                 if (pickerStep) {
                   setPickerStep(null);
@@ -120,35 +125,25 @@ export default function RequestForm({ onCreated }: Props) {
               }}>
                 {draft.targetDate ? new Date(`${draft.targetDate}T00:00:00`).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" }) : "Choose a date"}
               </button>
-              {pickerStep ? (
-                <div className="target-date-picker position-absolute top-100 start-0 mt-1 rounded border p-3 shadow" role="dialog" aria-label="Choose target date" onKeyDown={(event) => { if (event.key === "Escape") setPickerStep(null); }}>
-                  <div className="d-flex align-items-center justify-content-between mb-3">
-                    <button className="btn btn-sm btn-outline-light" type="button" aria-label="Go back" disabled={pickerStep === "year"} onClick={() => setPickerStep(pickerStep === "day" ? "month" : "year")}><i className="fa-solid fa-arrow-left" /></button>
-                    <strong>{pickerStep === "year" ? "Choose a year" : pickerStep === "month" ? `Choose a month · ${targetYear}` : `${monthNames[Number(targetMonth) - 1]} ${targetYear}`}</strong>
-                    <button className="btn btn-sm btn-outline-light" type="button" aria-label="Close date picker" onClick={() => setPickerStep(null)}><i className="fa-solid fa-xmark" /></button>
-                  </div>
-                  {pickerStep === "year" ? (
-                    <div className="row row-cols-3 g-2">
-                      {targetYears.map((year) => <div className="col" key={year}><button className={`btn w-100 ${selectedYear === year ? "btn-primary" : "btn-outline-light"}`} type="button" onClick={() => { setTargetYear(String(year)); setTargetMonth(""); setPickerStep("month"); }}>{year}</button></div>)}
-                    </div>
-                  ) : pickerStep === "month" ? (
-                    <div className="row row-cols-3 g-2">
-                      {targetMonths.map(({ name, value }) => <div className="col" key={value}><button className={`btn w-100 ${selectedYear === Number(targetYear) && selectedMonth === value ? "btn-primary" : "btn-outline-light"}`} type="button" onClick={() => { setTargetMonth(String(value)); setPickerStep("day"); }}>{name}</button></div>)}
-                    </div>
-                  ) : (
-                    <div className="target-date-days text-center">
-                      {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((day) => <span className="small text-muted" key={day}>{day}</span>)}
-                      {Array.from({ length: firstWeekday }, (_, index) => <span key={`empty-${index}`} />)}
-                      {Array.from({ length: targetDaysInMonth }, (_, index) => {
-                        const day = index + 1;
-                        const disabled = Number(targetYear) === minimumTargetDate.year && Number(targetMonth) === minimumTargetDate.month && day < minimumTargetDate.day;
-                        return <button className={`btn btn-sm px-0 ${selectedYear === Number(targetYear) && selectedMonth === Number(targetMonth) && selectedDay === day ? "btn-primary" : "btn-outline-light"}`} key={day} type="button" disabled={disabled} onClick={() => { update("targetDate", `${targetYear}-${formatDatePart(Number(targetMonth))}-${formatDatePart(day)}`); setPickerStep(null); }}>{day}</button>;
-                      })}
-                    </div>
-                  )}
-                </div>
-              ) : null}
             </div>
+            <dialog ref={pickerRef} className="target-date-dialog" aria-labelledby="target-date-title" onCancel={() => setPickerStep(null)} onClick={(event) => { if (event.target === event.currentTarget) setPickerStep(null); }}>
+              <div className="modal-content">
+                <div className="modal-header p-2">
+                  {pickerStep !== "year" && <button className="btn btn-link text-body p-1" type="button" aria-label="Go back" onClick={() => setPickerStep(pickerStep === "day" ? "month" : "year")}><i className="fa-solid fa-arrow-left" /></button>}
+                  <h2 id="target-date-title" className="modal-title fs-6 fw-bold mb-0 flex-grow-1 text-center">Choose {pickerStep || "a date"}{pickerStep === "month" ? ` · ${targetYear}` : pickerStep === "day" ? ` · ${monthNames[Number(targetMonth) - 1]} ${targetYear}` : ""}</h2>
+                  <button className="btn btn-link text-body p-1" type="button" aria-label="Close date picker" onClick={() => setPickerStep(null)}><i className="fa-solid fa-xmark" /></button>
+                </div>
+                <div className="modal-body overflow-y-auto overflow-x-hidden">
+                  {pickerStep === "year" && <div className="row g-2">{targetYears.map((year) => <div className="col-4" key={year}><button className={`btn w-100 ${selectedYear === year ? "btn-primary" : "btn-outline-light"}`} type="button" onClick={() => { setTargetYear(String(year)); setTargetMonth(""); setPickerStep("month"); }}>{year}</button></div>)}</div>}
+                  {pickerStep === "month" && <div className="row g-2">{targetMonths.map(({ name, value }) => <div className="col-4" key={value}><button className={`btn w-100 ${selectedYear === Number(targetYear) && selectedMonth === value ? "btn-primary" : "btn-outline-light"}`} type="button" onClick={() => { setTargetMonth(String(value)); setPickerStep("day"); }}>{name}</button></div>)}</div>}
+                  {pickerStep === "day" && <div className="row g-2">{Array.from({ length: targetDaysInMonth }, (_, index) => {
+                    const day = index + 1;
+                    const disabled = Number(targetYear) === minimumTargetDate.year && Number(targetMonth) === minimumTargetDate.month && day < minimumTargetDate.day;
+                    return <div className="col-2" key={day}><button className={`btn w-100 px-0 ${selectedYear === Number(targetYear) && selectedMonth === Number(targetMonth) && selectedDay === day ? "btn-primary" : "btn-outline-light"}`} type="button" disabled={disabled} onClick={() => { update("targetDate", `${targetYear}-${formatDatePart(Number(targetMonth))}-${formatDatePart(day)}`); setPickerStep(null); }}>{day}</button></div>;
+                  })}</div>}
+                </div>
+              </div>
+            </dialog>
           </fieldset>
           <label className="col-12 form-label">Budget range<input className="form-control mt-1" required placeholder="For example, $2,000-$4,000" value={draft.budgetRange} onChange={(event) => update("budgetRange", event.target.value)} /></label>
           <div className="col-12">
